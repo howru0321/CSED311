@@ -1,0 +1,112 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/03/16 20:02:20
+// Design Name: 
+// Module Name: ControlUnit
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+`include "opcodes.v"
+
+module ControlUnit(
+    reset,
+    opcode,  // input
+    rf17,
+    is_jal,        // output
+    is_jalr,       // output
+    branch,        // output
+    mem_read,      // output
+    mem_to_reg,    // output
+    mem_write,     // output
+    alu_src,       // output
+    write_enable,     // output
+    pc_to_reg,     // output
+    is_ecall       // output (ecall inst)
+    );
+    
+    input reset;
+    input [6:0] opcode;
+    input [31:0] rf17;
+   output reg is_jal;
+   output reg is_jalr;
+   output reg branch;
+   output reg mem_read;
+   output reg mem_to_reg;
+   output reg mem_write;
+   output reg alu_src;
+   output reg write_enable;
+   output reg pc_to_reg;
+   output reg is_ecall;
+   
+   
+   always @(*) begin
+   is_jal = 0;
+   is_jalr = 0;
+   branch = 0;
+   mem_read = 0;
+   mem_to_reg = 0;
+   mem_write = 0;
+   alu_src = 0;
+   write_enable = 0;
+   pc_to_reg = 0;
+   is_ecall = 0;
+  
+   
+ 
+   
+   if(opcode==`JAL) begin
+      is_jal = 1;
+      write_enable=1;
+      pc_to_reg=1;
+   end
+   
+   else if(opcode==`JALR) begin
+      write_enable = 1; 
+      is_jalr = 1;
+      alu_src = 1;
+      pc_to_reg = 1;
+   end
+   
+   else if(opcode==`BRANCH) begin
+      branch = 1;
+   end
+   
+   else if(opcode==`LOAD) begin
+      write_enable = 1;
+         mem_read = 1;
+         mem_to_reg = 1;
+         alu_src = 1;
+   end
+   
+   else if(opcode==`STORE) begin
+      mem_write = 1;
+             alu_src = 1;
+   end
+   
+   else if(opcode==`ARITHMETIC_IMM) begin
+      write_enable = 1;
+            alu_src = 1;
+   end
+   
+   else if(opcode==`ARITHMETIC) begin
+      write_enable = 1;
+   end
+   
+   else if(opcode==`ECALL) begin
+      is_ecall = 1;
+   end
+   
+   end
+endmodule
